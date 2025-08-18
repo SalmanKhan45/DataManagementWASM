@@ -1,0 +1,85 @@
+## Build results
+bin/
+obj/
+out/
+artifacts/
+
+## User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+## OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+*.json
+*.http
+
+## Rider and ReSharper
+.idea/
+*.sln.iml
+_ReSharper*/
+*.DotSettings.user
+
+## Visual Studio
+.vs/
+.vscode/
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Logs and crash dumps
+*.log
+*.tlog
+*.dmp
+
+## Package directories
+node_modules/
+bower_components/
+packages/
+wwwroot/lib/
+
+## Dependency caches
+.nuget/
+**/packages/*
+
+## NPM/Yarn
+package-lock.json
+yarn.lock
+.pnp.*
+.pnpm-debug.log
+
+## Azure Pipelines
+/.azure-pipelines/
+
+## Environment files
+.env
+.env.*
+
+## Coverage results
+coverage/
+*.coverage
+*.coveragexml
+TestResults/
+
+## Publish output
+publish/
+AppPackages/
+BundleArtifacts/
+
+## Backup & temporary files
+*~
+*.bak
+*.tmp
+*.temp
+*.swp
+*.swo
+
+## Database files
+*.mdf
+*.ldf
+*.ndf
