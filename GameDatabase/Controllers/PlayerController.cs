@@ -99,21 +99,24 @@ namespace GameDatabase.Controllers
         }
 
         [HttpPut("edit-column")]
-        public async Task<IActionResult> EditColumn([FromBody] BatchEditDTO column)
+        public async Task<IActionResult> EditColumn([FromBody] ColumnEditDTO column)
         {
             logger.LogInformation("--------------EDITING COLUMN FOR MULLTIPLE ROWS----------------");
+
+            if (column.ids.Count() == 0)
+                return BadRequest();
 
             PropertyInfo? propertyInfo = null;
             PropertyInfo[] playerProperties = typeof(Player).GetProperties();
             foreach (var property in playerProperties)
             {
-                if (property.Name == column.property.Name)
+                if (property.Name == column.property)
                 {
                     propertyInfo = property;
                 }
             }
 
-            var val = column.property.GetValue(column.playerData);
+            var val = propertyInfo.GetValue(column.playerData);
 
             if (column.forAll)
             {
@@ -124,6 +127,7 @@ namespace GameDatabase.Controllers
 
             await dbContext.Players.Where(p => column.ids.Contains(p.Id))
                 .ForEachAsync(p => { propertyInfo?.SetValue(p, val); });
+            await dbContext.SaveChangesAsync();
 
             return Ok();
         }

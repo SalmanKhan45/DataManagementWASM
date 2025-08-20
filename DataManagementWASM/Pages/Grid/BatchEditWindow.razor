@@ -1,0 +1,127 @@
+﻿
+@using Telerik.DataSource
+@using Telerik.DataSource.Extensions
+@using System.Reflection
+
+@inject HttpClient httpclient
+
+<TelerikWindow  Modal="true"
+                State="WindowState.Maximized"
+                @bind-Visible="@isModalVisible">
+    <WindowTitle>
+        Batch Edit Mode
+    </WindowTitle>
+    <WindowContent>
+        <TelerikGrid Data="@players"
+                     TItem="@Player"
+                     EditMode="@GridEditMode.Inline"
+                     PageSize="3"
+                     ShowColumnMenu="true"
+                     OnEdit="OnGridEdit"
+                     OnUpdate="@OnGridUpdate"
+                     OnStateChanged="@( (GridStateEventArgs<Player> args) => OnGridStateChanged(args) )">
+            <GridToolBarTemplate>
+            </GridToolBarTemplate>
+            <GridColumns>
+                <GridColumn Field="@nameof(Player.username)" Title="Username" />
+                <GridColumn Field="@nameof(Player.email)" Title="Email" />
+                <GridColumn Field="@nameof(Player.rank)" Title="Rank" />
+                <GridColumn Field="@nameof(Player.kills)" Title="Total Kills" />
+                <GridColumn Field="@nameof(Player.KD)" Title="K/D ratio" />
+                <GridColumn Field="@nameof(Player.headshots)" Title="Headshots" />
+                <GridColumn Field="@nameof(Player.accuracy)" Title="Accuracy" />
+                <GridCommandColumn Width="150px">
+                    <GridCommandButton Command="Edit">Edit</GridCommandButton>
+                    <GridCommandButton Command="Save" ShowInEdit="true">Save</GridCommandButton>
+                    <GridCommandButton Command="Cancel" ShowInEdit="true">Cancel</GridCommandButton>
+                </GridCommandColumn>
+            </GridColumns>
+        </TelerikGrid>
+
+        <br />
+        @if(multipleColsSelected)
+        {
+            <span><b>Please Select a single Column to edit</b></span>            
+        }
+
+        <br />
+        <br />
+        <TelerikCheckBox Id="updateAllCheckBox" @bind-Value="@updateAllRecords" />
+        <label for="updateAllCheckBox">Update all records in the database?</label>
+
+    </WindowContent>
+    <WindowActions>
+        <WindowAction Name="Close"/>
+    </WindowActions>
+</TelerikWindow>
+
+
+@code {
+    [CascadingParameter]
+    public bool isModalVisible { get; set; }
+    private int visibleColumnsCount { get; set; } = 0;
+    private bool multipleColsSelected { get; set; } = true;
+    private bool updateAllRecords { get; set; } = false;
+
+    [CascadingParameter]
+    public IEnumerable<Player> selectedPlayers { get; set; }
+
+    PropertyInfo[] playerProperties = typeof(Player).GetProperties();
+
+    ColumnEditDTO batchEditReq { get; set; } = new();
+
+    private List<Player> players { get; set; } = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        players.Add(new Player());
+    }
+
+    private async Task OnGridStateChanged(GridStateEventArgs<Player> args)
+    {
+        var columnStates = args.GridState.ColumnStates;
+
+        var visibleColumns = columnStates.Where(c => c.Visible != false);
+        visibleColumnsCount = visibleColumns.Count();
+
+        if (visibleColumnsCount == 2)
+        {
+            multipleColsSelected = false;
+            // foreach(var prop in playerProperties)
+            // {
+            //     if (prop.Name == visibleColumns.First().Field)
+            //         batchEditReq.property = prop;
+            // }
+            batchEditReq.property = visibleColumns.First().Field;
+        }
+        else
+        {
+            multipleColsSelected = true;
+        }
+    }
+
+    private async Task OnGridUpdate(GridCommandEventArgs args)
+    {
+
+        batchEditReq.playerData = (Player)args.Item;
+        batchEditReq.forAll = updateAllRecords;
+        batchEditReq.ids = selectedPlayers.Select(p => p.Id);
+
+        var response = await httpclient.PutAsJsonAsync<ColumnEditDTO>($"https://localhost:7065/edit-column", batchEditReq);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"An error occured, Status Code: {response.StatusCode} ");
+        }
+
+        isModalVisible = false;
+    }
+
+    private async Task OnGridEdit(GridCommandEventArgs args)
+    {
+        if(visibleColumnsCount != 2)
+        {
+            args.IsCancelled = true;
+        }
+    }
+}

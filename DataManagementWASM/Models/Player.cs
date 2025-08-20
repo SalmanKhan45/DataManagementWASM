@@ -6,7 +6,7 @@ namespace DataManagementWASM.Models
     {
         public Player() 
         {
-            username = string.Empty;
+            username = "user";
             email = "user@example.com";
             password = "1234";
             rank = 0;

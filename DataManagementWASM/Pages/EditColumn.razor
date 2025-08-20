@@ -1,10 +1,11 @@
-﻿@page "/grid-data"
+﻿@page "/edit-column"
 @using System.ComponentModel.DataAnnotations
 @using Telerik.DataSource
 @using Telerik.DataSource.Extensions
 @inject HttpClient httpclient
 
-<TelerikGrid Data="players"
+<TelerikGrid OnRead="@OnGridRead"
+             TItem="@Player"
              EditMode="@GridEditMode.Incell"
              FilterMode="@GridFilterMode.FilterRow"
              Sortable="true"
@@ -15,8 +16,10 @@
              OnUpdate="@OnGridUpdate">
     <GridToolBarTemplate>
         <GridCommandButton Command="Add">Add Item</GridCommandButton>
+        
     </GridToolBarTemplate>
     <GridColumns>
+        <GridCheckboxColumn SelectAll="true" />
         <GridColumn Field="@nameof(Player.username)" Title="Username" />
         <GridColumn Field="@nameof(Player.email)" Title="Email" />
         <GridColumn Field="@nameof(Player.rank)" Title="Rank" />
@@ -32,18 +35,9 @@
 
 @code {
 
-    private List<Player>? players = new();
     private bool followingCreate { get; set; } = false;
 
-    protected async override Task OnInitializedAsync()
-    {
-        await LoadData();
-    }
 
-    private async Task LoadData()
-    {
-        players = await httpclient.GetFromJsonAsync<List<Player>>($"https://localhost:7065/get-players");
-    }
 
     private async Task OnGridCreate(GridCommandEventArgs args)
     {
@@ -57,7 +51,6 @@
         }
 
         followingCreate = true;
-        await LoadData();
 
     }
 
@@ -72,7 +65,19 @@
             throw new Exception($"An error occured, Status Code: {response.StatusCode} ");
         }
 
-        await LoadData();
+    }
+
+    private async Task OnGridRead(GridReadEventArgs args)
+    {
+        var response = await httpclient.PostAsJsonAsync($"https://localhost:7065/get-all-players", args.Request);
+
+        if (!response.IsSuccessStatusCode)
+            throw new Exception($"Response did not return data, Response : {response.StatusCode}");
+
+        GridPlayerData? result = await response.Content.ReadFromJsonAsync<GridPlayerData>();
+
+        args.Data = result.CurrentPageData;
+        args.Total = result.TotalItemCount;
 
     }
 
@@ -80,12 +85,14 @@
     {
         if (followingCreate)
         {
+
             followingCreate = false;
             args.IsCancelled = true;
             return;
         }
 
         var updatedItem = (Player)args.Item;
+        // updatedItem.Id = LastId;
 
         var response = await httpclient.PutAsJsonAsync<Player>($"https://localhost:7065/edit-player/{updatedItem.Id}", updatedItem);
 
@@ -94,7 +101,6 @@
             throw new Exception($"An error occured, Status Code: {response.StatusCode} ");
         }
 
-        await LoadData();
     }
 
 }

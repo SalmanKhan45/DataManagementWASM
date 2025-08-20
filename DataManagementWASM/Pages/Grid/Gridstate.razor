@@ -118,7 +118,8 @@
             await Task.Delay(1500);
             GridStateChangedPropertyClass = string.Empty;
         }
-
+        
+        var colstate = args.GridState.ColumnStates.Where(c => c.Visible == true).First();
         ++OnStateChangedCount;
 
         GridStateChangedProperty = args.PropertyName;

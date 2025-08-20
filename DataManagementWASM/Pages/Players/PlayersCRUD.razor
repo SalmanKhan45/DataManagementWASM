@@ -1,5 +1,4 @@
 ﻿@page "/manage-players"
-@using System.ComponentModel.DataAnnotations
 @using Telerik.DataSource
 @using Telerik.DataSource.Extensions
 @inject HttpClient httpclient
@@ -11,6 +10,8 @@
              Sortable="true"
              Pageable="true"
              PageSize="3"
+             SelectionMode="@GridSelectionMode.Multiple"
+             @bind-SelectedItems="@selectedPlayers"
              OnCreate="@OnGridCreate"
              OnDelete="@OnGridDelete"
              OnUpdate="@OnGridUpdate">
@@ -18,6 +19,7 @@
         <GridCommandButton Command="Add">Add Item</GridCommandButton>
     </GridToolBarTemplate>
     <GridColumns>
+        <GridCheckboxColumn SelectAll="true"></GridCheckboxColumn>
         <GridColumn Field="@nameof(Player.username)" Title="Username" />
         <GridColumn Field="@nameof(Player.email)" Title="Email" />
         <GridColumn Field="@nameof(Player.rank)" Title="Rank" />
@@ -31,11 +33,27 @@
     </GridColumns>
 </TelerikGrid>
 
+<TelerikButton OnClick="EnterBatchEditMode">Batch Edit Mode</TelerikButton>
+
+<CascadingValue Value="@selectedPlayers">
+    <CascadingValue Value="@isModalVisible">
+        <BatchEditWindow></BatchEditWindow>
+    </CascadingValue>
+</CascadingValue>
+
+
 @code {
 
     private bool followingCreate { get; set; } = false;
+    private bool isModalVisible { get; set; } = false;
+
+    public IEnumerable<Player> selectedPlayers { get; set; } = new List<Player>();
 
 
+    protected override async Task OnInitializedAsync()
+    {
+        isModalVisible = false;
+    }
 
     private async Task OnGridCreate(GridCommandEventArgs args)
     {
@@ -67,6 +85,7 @@
 
     private async Task OnGridRead(GridReadEventArgs args)
     {
+
         var response = await httpclient.PostAsJsonAsync($"https://localhost:7065/get-all-players", args.Request);
 
         if (!response.IsSuccessStatusCode)
@@ -88,7 +107,7 @@
             args.IsCancelled = true;
             return;
         }
-        
+
         var updatedItem = (Player)args.Item;
         // updatedItem.Id = LastId;
 
@@ -99,6 +118,11 @@
             throw new Exception($"An error occured, Status Code: {response.StatusCode} ");
         }
 
+    }
+
+    private void EnterBatchEditMode()
+    {
+        isModalVisible = true;
     }
 
 }
