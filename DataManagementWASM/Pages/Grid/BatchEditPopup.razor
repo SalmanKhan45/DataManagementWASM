@@ -1,0 +1,112 @@
+﻿@using Telerik.DataSource
+@using Telerik.DataSource.Extensions
+@using System.Reflection
+
+@inject HttpClient httpclient
+
+<TelerikWindow Modal="true"
+               State="WindowState.Default"
+               CloseOnOverlayClick="false"
+               @bind-Visible="@isModalVisible"
+               Width="50%"
+               Height="50%">
+    <WindowTitle>
+        Batch Edit Mode
+    </WindowTitle>
+    <WindowContent>
+        <h6>
+            Select a Column To Edit
+        </h6>
+        <br />
+        <label>Column name</label>
+        <br />
+        <TelerikDropDownList Data="@DropDownData"
+                             @bind-Value="SelectedValue"
+                             TextField="@nameof(SelectedValue)"
+                             ValueField="@nameof(DropDownData)"
+                             Width="14em"
+                             OnChange="DropDownValueChanged"
+                             AdaptiveMode="@AdaptiveMode.Auto">
+        </TelerikDropDownList>
+
+        <br />
+        <br />
+        @if(!string.IsNullOrEmpty(SelectedValue))
+        {
+        <TelerikForm Model="@batchEditReq.playerData" OnSubmit="@OnSubmitHandler" @ref="@FormRef">
+            <FormValidation>
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+            </FormValidation>
+            <FormItems>
+                <FormItem Field="@SelectedValue" LabelText="Column Value"/>
+            </FormItems>
+                <FormButtons>
+                    <TelerikButton ButtonType="@ButtonType.Submit" ThemeColor="primary">Save Changes</TelerikButton>
+                </FormButtons>
+        </TelerikForm>
+        }
+
+    </WindowContent>
+    <WindowActions>
+        <WindowAction Name="Close" />
+    </WindowActions>
+</TelerikWindow>
+
+
+@code {
+    [CascadingParameter]
+    public bool isModalVisible { get; set; }
+
+    [CascadingParameter]
+    public IEnumerable<Player>? selectedPlayers { get; set; }
+
+    [Parameter]
+    public EventCallback RebindGrid { get; set; }
+
+    [Parameter]
+    public bool AllPlayersSelected { get; set; }
+
+    private TelerikForm FormRef { get; set; }
+    private PropertyInfo[] playerColumns { get; set; }
+
+
+    ColumnEditDTO batchEditReq { get; set; } = new();
+
+    private IEnumerable<string> DropDownData { get; set; }
+    private string SelectedValue { get; set; }
+
+
+
+    protected override void OnInitialized()
+    {
+        playerColumns = typeof(Player).GetProperties();
+        DropDownData = playerColumns.Where(c => c.Name != "Id").Select(c => c.Name);
+        SelectedValue = DropDownData.First();
+    }
+
+    private async Task OnSubmitHandler()
+    {
+        if (!FormRef.EditContext.Validate())
+        {
+            return;
+        }
+
+        batchEditReq.ids = selectedPlayers.Select(p => p.Id);
+        batchEditReq.property = SelectedValue;
+        batchEditReq.forAll = false;
+        var response = await httpclient.PutAsJsonAsync<ColumnEditDTO>($"https://localhost:7065/edit-column", batchEditReq);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"An error occured, Status Code: {response.StatusCode} ");
+        }
+
+        RebindGrid.InvokeAsync();
+    }
+
+    private void DropDownValueChanged()
+    {
+        batchEditReq.playerData.ResetProperties();
+    }
+
+}
