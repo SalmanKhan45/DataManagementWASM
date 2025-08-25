@@ -6,10 +6,10 @@ namespace DataManagementWASM.Models
     {
         public IEnumerable<int> ids { get; set; }
 
-        public string property { get; set; }
+        public string property { get; set; } = string.Empty;
 
         public bool forAll { get; set; } = false;
 
-        public Player playerData { get; set; }
+        public Player playerData { get; set; } = new();
     }
 }

@@ -15,7 +15,7 @@ namespace GameDatabase
             // Add services to the container.
             builder.Services.AddDbContext<PlayerContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("BF1"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("GameDB"));
             });
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

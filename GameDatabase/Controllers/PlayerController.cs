@@ -53,13 +53,13 @@ namespace GameDatabase.Controllers
                 return BadRequest();
             }
 
-            playerToEdit.username = player.username;
-            playerToEdit.email = player.email;
-            playerToEdit.rank = player.rank;
-            playerToEdit.kills = player.kills;
+            playerToEdit.Username = player.Username;
+            playerToEdit.Email = player.Email;
+            playerToEdit.Rank = player.Rank;
+            playerToEdit.Kills = player.Kills;
             playerToEdit.KD = player.KD;
-            playerToEdit.headshots = player.headshots;
-            playerToEdit.accuracy = player.accuracy;
+            playerToEdit.Headshots = player.Headshots;
+            playerToEdit.Accuracy = player.Accuracy;
 
             await dbContext.SaveChangesAsync();
 
@@ -81,13 +81,13 @@ namespace GameDatabase.Controllers
                     return BadRequest();
                 }
 
-                playerToEdit.username = player.username;
-                playerToEdit.email = player.email;
-                playerToEdit.rank = player.rank;
-                playerToEdit.kills = player.kills;
+                playerToEdit.Username = player.Username;
+                playerToEdit.Email = player.Email;
+                playerToEdit.Rank = player.Rank;
+                playerToEdit.Kills = player.Kills;
                 playerToEdit.KD = player.KD;
-                playerToEdit.headshots = player.headshots;
-                playerToEdit.accuracy = player.accuracy;
+                playerToEdit.Headshots = player.Headshots;
+                playerToEdit.Accuracy = player.Accuracy;
 
                 playersChangedCount++;
             }

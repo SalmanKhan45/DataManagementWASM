@@ -29,30 +29,26 @@ namespace GameDatabase.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Accuracy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Headshots")
+                        .HasColumnType("int");
+
                     b.Property<float>("KD")
                         .HasColumnType("real");
 
-                    b.Property<int>("accuracy")
+                    b.Property<int>("Kills")
                         .HasColumnType("int");
 
-                    b.Property<string>("email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("headshots")
+                    b.Property<int>("Rank")
                         .HasColumnType("int");
 
-                    b.Property<int>("kills")
-                        .HasColumnType("int");
-
-                    b.Property<string>("password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("rank")
-                        .HasColumnType("int");
-
-                    b.Property<string>("username")
+                    b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -64,38 +60,79 @@ namespace GameDatabase.Migrations
                         new
                         {
                             Id = 1,
+                            Accuracy = 53,
+                            Email = "abc@gmail.com",
+                            Headshots = 9,
                             KD = 0.6f,
-                            accuracy = 53,
-                            email = "abc@gmail.com",
-                            headshots = 9,
-                            kills = 78,
-                            password = "abc123",
-                            rank = 2,
-                            username = "abc"
+                            Kills = 78,
+                            Rank = 2,
+                            Username = "abc"
                         },
                         new
                         {
                             Id = 2,
+                            Accuracy = 75,
+                            Email = "something@gmail.com",
+                            Headshots = 21,
                             KD = 0.79f,
-                            accuracy = 75,
-                            email = "something@gmail.com",
-                            headshots = 21,
-                            kills = 190,
-                            password = "iqjifnqw3",
-                            rank = 3,
-                            username = "xingq"
+                            Kills = 190,
+                            Rank = 3,
+                            Username = "xingq"
                         },
                         new
                         {
                             Id = 3,
+                            Accuracy = 80,
+                            Email = "matt@gmail.com",
+                            Headshots = 89,
                             KD = 0.95f,
-                            accuracy = 80,
-                            email = "ice23@gmail.com",
-                            headshots = 89,
-                            kills = 294,
-                            password = "jr3i214",
-                            rank = 4,
-                            username = "matt41"
+                            Kills = 294,
+                            Rank = 4,
+                            Username = "matt41"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Accuracy = 81,
+                            Email = "user3@gmail.com",
+                            Headshots = 90,
+                            KD = 0.98f,
+                            Kills = 456,
+                            Rank = 6,
+                            Username = "user39"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Accuracy = 66,
+                            Email = "bot@gmail.com",
+                            Headshots = 2,
+                            KD = 0.5f,
+                            Kills = 34,
+                            Rank = 1,
+                            Username = "bot"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Accuracy = 76,
+                            Email = "bee33@gmail.com",
+                            Headshots = 6,
+                            KD = 0.85f,
+                            Kills = 60,
+                            Rank = 2,
+                            Username = "bee3"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Accuracy = 67,
+                            Email = "newuser@gmail.com",
+                            Headshots = 3,
+                            KD = 0.7f,
+                            Kills = 56,
+                            Rank = 1,
+                            Username = "player213"
                         });
                 });
 #pragma warning restore 612, 618
